@@ -214,7 +214,7 @@ int compareDates(char *entered, char *exit) {
 
     int entryDate, entryMonth, entryYear, exitDay, exitMonth, exitYear;
 
-    if (strcmp(exit, "-") == 0)
+    if (strcmp(exit, "-") == 0 || strcmp(exit, "-\r")==0)
         return 1;
 
     char *entry_copy = malloc((strlen(entered) + 1) * sizeof(char));

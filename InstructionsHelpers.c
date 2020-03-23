@@ -126,7 +126,7 @@ HeapNode *getTotalInfectedByDisease(Node *node, char *date1, char *date2) {
     }
 
     for (int i = 0; i < totalCountries; i++)
-        if (infected[i] != NULL){
+        if (infected[i] != NULL) {
             free(infected[i]->name);
             free(infected[i]);
         }
@@ -304,7 +304,7 @@ int countCurrentPatientsInTree(Node *node) {
     int a = countCurrentPatientsInTree(node->left);
     int b = countCurrentPatientsInTree(node->right);
 
-    if (strcmp(node->key->exitDate, "-") == 0)
+    if (strcmp(node->key->exitDate, "-") == 0 || strcmp(node->key->exitDate, "-\r") == 0)
         return a + b + 1;
     else
         return a + b;
