@@ -413,7 +413,8 @@ void topk_Countries(int k, char *disease, char *date1, char *date2) {
 
     }
 
-    deleteHeap(heap);
+    if(k != heap_size)
+        deleteHeap(heap);
 }
 
 
