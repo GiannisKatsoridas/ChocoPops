@@ -13,33 +13,14 @@ int main(int argc, char** argv) {
     char* patientRecordsFile;
 
     parseArguments(argv, &patientRecordsFile);
-    if(errorCode == 1)
-        return 0;
 
     globalStructsInitialization();
 
     parseRecords(patientRecordsFile);
-
-    bucket* a = diseaseHashTable[0];
+    if(errorCode == 1)
+        return 0;
 
     printf("Records parsed. Please, give input:\n");
-
-    /*HeapNode* h = NULL;
-    for(int i=0; i<20; i++){
-        h = insertToHeap(h, 0, i+1, "-", rand() % 100);
-    }
-
-    printHeap(h);
-
-    printf("/////////////////////////////////\n");
-
-    h = popFromHeap(h, 20);
-    h = popFromHeap(h, 19);
-    h = popFromHeap(h, 18);
-    h = popFromHeap(h, 17);
-
-    printHeap(h);
-*/
 
     char* line = NULL;
     size_t length;

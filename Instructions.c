@@ -206,17 +206,17 @@ void executeInstruction(char *line) {
 
     } else if (strcmp(num, "/numCurrentPatients") == 0) {
 
-        char* disease = NULL;
+        char *disease = NULL;
 
         num = strtok(NULL, delimeters);
-        if(num != NULL) {
+        if (num != NULL) {
             disease = malloc((strlen(num) + 1) * sizeof(char));
             strcpy(disease, num);
         }
 
         numCurrentPatients(disease);
 
-        if(disease != NULL)
+        if (disease != NULL)
             free(disease);
 
     } else
@@ -331,6 +331,11 @@ void topk_Diseases(int k, char *country, char *date1, char *date2) {
 
     heap = getTotalInfectedByCountry(ptr->items[pos]->value, date1, date2);
 
+    if(heap == NULL){
+        printf("No diseases found in given country.\n");
+        return;
+    }
+
     heap_size = getHeapSize(heap);
 
     if (heap_size < k) {
@@ -351,7 +356,7 @@ void topk_Diseases(int k, char *country, char *date1, char *date2) {
         free(n);
     }
 
-    if(heap != NULL)
+    if (heap != NULL)
         deleteHeap(heap);
 }
 
@@ -392,6 +397,11 @@ void topk_Countries(int k, char *disease, char *date1, char *date2) {
 
     heap = getTotalInfectedByDisease(ptr->items[pos]->value, date1, date2);
 
+    if (heap == NULL) {
+        printf("No countries found with given disease.\n");
+        return;
+    }
+
     heap_size = getHeapSize(heap);
 
     if (heap_size < k) {
@@ -413,7 +423,8 @@ void topk_Countries(int k, char *disease, char *date1, char *date2) {
 
     }
 
-    deleteHeap(heap);
+    if (k != heap_size)
+        deleteHeap(heap);
 }
 
 
@@ -454,18 +465,18 @@ void insertPatientRecord(char *recordID, char *patientFirstName, char *patientLa
 
 void numCurrentPatients(char *disease) {
 
-    for(int i=0; i<diseaseHashTableNumOfEntries; i++){
+    for (int i = 0; i < diseaseHashTableNumOfEntries; i++) {
 
-        bucket* ptr = diseaseHashTable[i];
+        bucket *ptr = diseaseHashTable[i];
 
-        while(ptr != NULL){
+        while (ptr != NULL) {
 
-            for(int j=0; j<available_items; j++){
+            for (int j = 0; j < available_items; j++) {
 
-                if(ptr->items[j] == NULL)
+                if (ptr->items[j] == NULL)
                     break;
 
-                if(disease != NULL && strcmp(disease, ptr->items[j]->key)!=0)
+                if (disease != NULL && strcmp(disease, ptr->items[j]->key) != 0)
                     continue;
 
                 int sum = countCurrentPatientsInTree(ptr->items[j]->value);
@@ -480,21 +491,21 @@ void numCurrentPatients(char *disease) {
 }
 
 
-void exitInstruction(){
+void exitInstruction() {
 
-    for(int i=0; i<diseaseHashTableNumOfEntries; i++){
+    for (int i = 0; i < diseaseHashTableNumOfEntries; i++) {
 
-        if(diseaseHashTable[i] == NULL)
+        if (diseaseHashTable[i] == NULL)
             continue;
 
-        bucket* ptr = diseaseHashTable[i];
-        bucket* next;
+        bucket *ptr = diseaseHashTable[i];
+        bucket *next;
 
-        while(ptr != NULL){
+        while (ptr != NULL) {
 
-            for(int j=0; j<available_items; j++){
+            for (int j = 0; j < available_items; j++) {
 
-                if(ptr->items[j] != NULL) {
+                if (ptr->items[j] != NULL) {
                     deleteTree(ptr->items[j]->value);
                     free(ptr->items[j]);
                 }
@@ -509,19 +520,19 @@ void exitInstruction(){
 
     free(diseaseHashTable);
 
-    for(int i=0; i<countryHashTableNumOfEntries; i++){
+    for (int i = 0; i < countryHashTableNumOfEntries; i++) {
 
-        if(countryHashTable[i] == NULL)
+        if (countryHashTable[i] == NULL)
             continue;
 
-        bucket* ptr = countryHashTable[i];
-        bucket* next;
+        bucket *ptr = countryHashTable[i];
+        bucket *next;
 
-        while(ptr != NULL){
+        while (ptr != NULL) {
 
-            for(int j=0; j<available_items; j++){
+            for (int j = 0; j < available_items; j++) {
 
-                if(ptr->items[j] != NULL) {
+                if (ptr->items[j] != NULL) {
                     deleteTreeAndRecords(ptr->items[j]->value);
                     free(ptr->items[j]);
                 }
