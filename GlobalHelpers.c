@@ -78,6 +78,9 @@ void parseArguments(char** argv, char** patientRecordsFile){
 
 }
 
+// abcd, max 5
+// 67+68+69+70 = 274 % 5 = 4
+
 int hashFunction(char *string, int max) {
 
     int sum = 0;

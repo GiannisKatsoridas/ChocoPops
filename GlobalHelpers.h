@@ -25,7 +25,7 @@ typedef struct AVL_tree_node
 
 typedef struct bucket_item_struct {
 
-    char key[20];
+    char key[30];
     Node* value;
 
 } bucket_item;

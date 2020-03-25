@@ -223,7 +223,7 @@ int compareDates(char *entered, char *exit) {
     strcpy(entry_copy, entered);
     strcpy(exit_copy, exit);
 
-    char *delimiters = "-\0";
+    char *delimiters = "-\r\0";
     char *num;
 
     num = strtok(entry_copy, delimiters);
