@@ -3,9 +3,7 @@
 #include <string.h>
 #include "AVL.h"
 
-
-int checkRecordID(char *recordID);
-
+// Open the file and get line by line.
 void parseRecords(char *patientRecordsFile) {
 
     FILE *f = fopen(patientRecordsFile, "r");
@@ -21,18 +19,18 @@ void parseRecords(char *patientRecordsFile) {
 
     while (size >= 0 && !feof(f)) {
 
-        parseLine(line, delimeters);
+        parseLine(line, delimeters);        // Parse each line exclusively to get the record details
 
         free(line);
         line = NULL;
 
-        if(errorCode == 1)
+        if(errorCode == 1)                  // There has been an error
             return;
 
         size = getline(&line, &length, f);
 
     }
-    parseLine(line, delimeters);
+    parseLine(line, delimeters);            // Parse the final line
 
 
     free(line);
@@ -42,6 +40,9 @@ void parseRecords(char *patientRecordsFile) {
 
 }
 
+// Parse each line of the file and split it by the delimeters above to get all the
+// fields of the record. Store them in a record* variable and store the pointer
+// in each of the hash tables.
 void parseLine(char *line, char *delimeters) {
 
     record *r = malloc(sizeof(record));
@@ -83,7 +84,7 @@ void parseLine(char *line, char *delimeters) {
     r->exitDate = malloc((strlen(num) + 1) * sizeof(char));
     strcpy(r->exitDate, num);
 
-    int result = compareDates(r->entryDate, r->exitDate);
+    int result = compareDates(r->entryDate, r->exitDate);       // if the exit date is smaller than the entry date then 0 will be returned.
 
     if (result == 0) {
         printf("ERROR on record: %s. Wrong dates. The record will not be saved.\n", r->recordID);
@@ -91,15 +92,16 @@ void parseLine(char *line, char *delimeters) {
     }
 
 
-    if (!checkRecordID(r->recordID)) {
+    if (!checkRecordID(r->recordID)) {          // if a record id is duplicate then the program will exit.
         printf("Record with ID: %s is duplicate. Program will now exit.\n", r->recordID);
         errorCode = 1;
         return;
     }
 
-    insertRecord(r);
+    insertRecord(r);                // insert the record in the hash tables (both of them - pointer to the record to have 0 data deduplication)
 }
 
+// Search all the trees to find whether the given record id already exists.
 int checkRecordID(char *recordID) {
 
     for (int i = 0; i < diseaseHashTableNumOfEntries; i++) {
@@ -141,14 +143,15 @@ void insertRecord(record *rec) {
     if (diseaseHashTable[diseaseHash] == NULL)
         diseaseHashTable[diseaseHash] = initializeBucket();
 
-    bucket *ptr = diseaseHashTable[diseaseHash];
+    bucket *ptr = diseaseHashTable[diseaseHash];        // find the proper hashTable position for the record to be inserted
 
    if (available_items <= 0){
         perror("ERROR. Bucket Size too small to host records.\n");
         errorCode = 1;
+        return;
     }
 
-    insertDataToBucket(ptr, rec->diseaseID, rec);
+    insertDataToBucket(ptr, rec->diseaseID, rec);       // insert the record in the diseases hash table
 
     // Insert record to countries Hash Table
 
@@ -157,29 +160,29 @@ void insertRecord(record *rec) {
 
     ptr = countryHashTable[countryHash];
 
-    insertDataToBucket(ptr, rec->country, rec);
-
-    //printf("Inserted disease: %s and country: %s\n", rec->diseaseID, rec->country);
-
+    insertDataToBucket(ptr, rec->country, rec);         // insert the record in the countries hash table
 
 }
 
+// First go through all the buckets in the list and through all their items to find if a similar
+// disease/country has already been inserted. If true, then insert the record in the given tree.
+// Else, create a new bucket item (and perhaps a new bucket as well) and insert them in it.
 void insertDataToBucket(bucket *ptr, char *data, record *rec) {
 
     int pos = -1;
 
     while (pos < 0) {
 
-        for (int i = 0; i < available_items; i++) {
+        for (int i = 0; i < available_items; i++) {     // go through all the items of this bucket
 
-            if (ptr->items[i] == NULL) {
+            if (ptr->items[i] == NULL) {                // if its NULL then there are no more items in this bucket
 
                 pos = i;
                 break;
 
             }
 
-            if (strcmp(ptr->items[i]->key, data) == 0) {
+            if (strcmp(ptr->items[i]->key, data) == 0) {    // given disease/country was found
 
                 pos = i;
                 break;
@@ -191,13 +194,13 @@ void insertDataToBucket(bucket *ptr, char *data, record *rec) {
         if (pos >= 0)
             break;
 
-        if (ptr->next == NULL)
+        if (ptr->next == NULL)          // this bucket is final and therefore need to initialize a new bucket to place new record
             ptr->next = initializeBucket();
 
         ptr = ptr->next;
     }
 
-    if (ptr->items[pos] == NULL) {
+    if (ptr->items[pos] == NULL) {      // there has been no record with the same disease/country so far
 
         ptr->items[pos] = malloc(sizeof(bucket_item));
         strcpy(ptr->items[pos]->key, data);
@@ -205,16 +208,17 @@ void insertDataToBucket(bucket *ptr, char *data, record *rec) {
 
     }
 
-    ptr->items[pos]->value = insert(ptr->items[pos]->value, rec);
+    ptr->items[pos]->value = insert(ptr->items[pos]->value, rec);       // insert the record in the tree
 
 
 }
 
+// Compare two dates. If entered is bigger than exit then 0 is returned. Else 1 is returned.
 int compareDates(char *entered, char *exit) {
 
     int entryDate, entryMonth, entryYear, exitDay, exitMonth, exitYear;
 
-    if (strcmp(exit, "-") == 0 || strcmp(exit, "-\r")==0)
+    if (strcmp(exit, "-") == 0 || strcmp(exit, "-\r")==0)       // in some linux computers, a \r is added to the end of the line
         return 1;
 
     char *entry_copy = malloc((strlen(entered) + 1) * sizeof(char));
@@ -226,7 +230,7 @@ int compareDates(char *entered, char *exit) {
     char *delimiters = "-\r\0";
     char *num;
 
-    num = strtok(entry_copy, delimiters);
+    num = strtok(entry_copy, delimiters);           // split both dates be '-' to get the day, month and year and compare them
     entryDate = atoi(num);
     num = strtok(NULL, delimiters);
     entryMonth = atoi(num);

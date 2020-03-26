@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "AVL.h"
 
+
+// Get the height of the tree (NOT the balance)
 int getBalance(Node *node) {
 
     if (node == NULL)
@@ -14,6 +16,7 @@ int getBalance(Node *node) {
 
 }
 
+// Insert a node to the tree. Insert a node as if it was a BST and then check the balances for the AVL property.
 Node *insert(Node *node, record *rec) {
 
     if (node == NULL) {
@@ -26,7 +29,7 @@ Node *insert(Node *node, record *rec) {
 
     }
 
-    if (compareDates(rec->entryDate, node->key->entryDate) == 0)
+    if (compareDates(rec->entryDate, node->key->entryDate) == 0)        // recursively insert in the correct subtree
         node->right = insert(node->right, rec);
     else
         node->left = insert(node->left, rec);
@@ -34,7 +37,7 @@ Node *insert(Node *node, record *rec) {
 
     int rightHeight = getBalance(node->right);
     int leftHeight = getBalance(node->left);
-    if(rightHeight - leftHeight >= -1 && rightHeight - leftHeight <= 1)
+    if(rightHeight - leftHeight >= -1 && rightHeight - leftHeight <= 1)     // There is no violation of AVL property
         return node;
 
     if(leftHeight > rightHeight && compareDates(rec->entryDate, node->left->key->entryDate)==1)
@@ -47,6 +50,7 @@ Node *insert(Node *node, record *rec) {
         return rightRight(node);
 }
 
+// Simple Right Rotation
 Node* leftLeft(Node* node){
 
     Node* head = node;
@@ -58,6 +62,7 @@ Node* leftLeft(Node* node){
     return child;
 }
 
+// Simple Left Rotation
 Node* rightRight(Node* node){
 
     Node* head = node;
@@ -69,35 +74,23 @@ Node* rightRight(Node* node){
     return child;
 }
 
+// Left Then Right Rotation
 Node* leftRight(Node* node){
-
-//    Node* head = node;
-//    Node* child = node->left;
-//
-//    head->left = child->right;
-//    child->right = head->left->left;
-//    head->left->left = child;
 
     node->left = rightRight(node->left);
 
     return leftLeft(node);
 }
 
+// Right Then Left Rotation
 Node* rightLeft(Node* node){
-
-//    Node* head = node;
-//    Node* child = node->right;
-//
-//    head->right = child->left;
-//    child->left = head->right->right;
-//    head->right->right = child;
 
     node->right = leftLeft(node->right);
 
     return rightRight(node);
 }
 
-
+// Search the tree for a recordID
 Node *search(Node *node, char *recordID) {
 
     if(node == NULL)
@@ -113,6 +106,7 @@ Node *search(Node *node, char *recordID) {
     }
 }
 
+// Delete the tree. DO NOT delete the records. Just the tree struct.
 void deleteTree(Node *node) {
 
     if (node->left != NULL)
@@ -124,6 +118,7 @@ void deleteTree(Node *node) {
     free(node);
 }
 
+// Delete the tree AND the records.
 void deleteTreeAndRecords(Node *node) {
 
     if (node->left != NULL)

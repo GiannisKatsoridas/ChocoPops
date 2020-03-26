@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "InstructionsHelpers.h"
 
-
+// Depending on the instruction, execute the appropriate function and get the requested results
 void executeInstruction(char *line) {
 
     char *delimeters = " \t\n\0";
@@ -16,9 +16,9 @@ void executeInstruction(char *line) {
         num = strtok(NULL, delimeters);
 
         if (num == NULL)
-            globalDiseaseStats(NULL, NULL);
+            globalDiseaseStats(NULL, NULL); // get globalDiseaseStats without dates
 
-        else {
+        else {      // dates have been added, get appropriate results
 
             char *arg1 = malloc((strlen(num) + 1) * sizeof(char));
             strcpy(arg1, num);
@@ -35,7 +35,7 @@ void executeInstruction(char *line) {
 
     } else if (strcmp(num, "/diseaseFrequency") == 0) {
 
-        num = strtok(NULL, delimeters);
+        num = strtok(NULL, delimeters);             // get the instruction arguments
         char *virusName = malloc((strlen(num) + 1) * sizeof(char));
         strcpy(virusName, num);
 
@@ -136,6 +136,12 @@ void executeInstruction(char *line) {
         char *recordID = malloc((strlen(num) + 1) * sizeof(char));
         strcpy(recordID, num);
 
+        if(searchForRecord(recordID) != NULL){      // there has already been a patient with the same record id
+            printf("Patient with given record already exists. Please give a different record ID.\n");
+            free(recordID);
+            return;
+        }
+
         num = strtok(NULL, delimeters);
         char *patientFirstName = malloc((strlen(num) + 1) * sizeof(char));
         strcpy(patientFirstName, num);
@@ -190,6 +196,15 @@ void executeInstruction(char *line) {
 
         if (rec == NULL) {
             printf("No such record ID was found. Please try again with a valid recordID.\n");
+            free(recordID);
+            free(exitDate);
+            return;
+        }
+
+        if(compareDates(rec->entryDate, exitDate) == 0){
+            printf("Wrong date. Date of exit is previous to date of entry. Please provide correct dates:\n");
+            free(recordID);
+            free(exitDate);
             return;
         }
 
@@ -197,7 +212,6 @@ void executeInstruction(char *line) {
             free(rec->exitDate);
 
         rec->exitDate = malloc((strlen(exitDate) + 1) * sizeof(char));
-
 
         strcpy(rec->exitDate, exitDate);
 
@@ -222,10 +236,10 @@ void executeInstruction(char *line) {
     } else
         printf("ERROR. Not an acceptable instruction.\n");
 
-
 }
 
-
+// Search through all the trees in all the nodes from the diseaseHashTable and get the size of each tree.
+// If dates have been given, take them into consideration when counting the tree size.
 void globalDiseaseStats(char *date1, char *date2) {
 
     for (int i = 0; i < diseaseHashTableNumOfEntries; i++) {
@@ -244,10 +258,10 @@ void globalDiseaseStats(char *date1, char *date2) {
 
                 if (date1 == NULL)
                     printf("Disease: %s\t\tNumber of Patients: %d\n", ptr->items[j]->key,
-                           getTreeSize(ptr->items[j]->value));
+                           getTreeSize(ptr->items[j]->value));  // count every node as a patient
                 else
                     printf("Disease: %s\t\tNumber of Patients: %d\n", ptr->items[j]->key,
-                           getTreeSizeBetweenDates(ptr->items[j]->value, date1, date2));
+                           getTreeSizeBetweenDates(ptr->items[j]->value, date1, date2));    // count only nodes inside the given dates
 
             }
 
@@ -257,7 +271,8 @@ void globalDiseaseStats(char *date1, char *date2) {
 
 }
 
-
+// Search the diseaseHashTable for given disease. If found get the tree size (from given country if needed)
+// whose records are inside the given dates.
 void diseaseFrequency(char *virusName, char *date1, char *date2, char *country) {
 
     int hashPos = hashFunction(virusName, diseaseHashTableNumOfEntries);
@@ -265,7 +280,7 @@ void diseaseFrequency(char *virusName, char *date1, char *date2, char *country) 
 
     bucket *ptr = diseaseHashTable[hashPos];
 
-    while (ptr != NULL) {
+    while (ptr != NULL) {       // search all the buckets in the list
 
         for (int i = 0; i < available_items; i++) {
             if (ptr->items[i] == NULL)
@@ -294,7 +309,8 @@ void diseaseFrequency(char *virusName, char *date1, char *date2, char *country) 
 
 }
 
-
+// Get the total number of people infected in a given country. Place them in an array and then insert them in
+// a heap.
 void topk_Diseases(int k, char *country, char *date1, char *date2) {
 
     int heap_size = getTotalDiseases();
@@ -329,6 +345,8 @@ void topk_Diseases(int k, char *country, char *date1, char *date2) {
         return;
     }
 
+    // Get the people infected in the given country.
+
     heap = getTotalInfectedByCountry(ptr->items[pos]->value, date1, date2);
 
     if(heap == NULL){
@@ -345,6 +363,7 @@ void topk_Diseases(int k, char *country, char *date1, char *date2) {
 
     }
 
+    // For each Disease in the heap, pop the head of the heap and print it. The heap will balance itself and give the next biggest disease.
     for (int i = 0; i < k; i++) {
 
         HeapNode *n = heap;
@@ -356,11 +375,11 @@ void topk_Diseases(int k, char *country, char *date1, char *date2) {
         free(n);
     }
 
-    if (heap != NULL)
+    if (k != heap_size)
         deleteHeap(heap);
 }
 
-
+// Same as above with only difference being the hash table and the value compared (disease, not country)
 void topk_Countries(int k, char *disease, char *date1, char *date2) {
 
     int heap_size;
@@ -427,7 +446,7 @@ void topk_Countries(int k, char *disease, char *date1, char *date2) {
         deleteHeap(heap);
 }
 
-
+// Similar to the records parsing, insert a record * in the appropriate tree
 void insertPatientRecord(char *recordID, char *patientFirstName, char *patientLastName, char *diseaseID, char *country,
                          char *entryDate, char *exitDate) {
 
@@ -459,10 +478,11 @@ void insertPatientRecord(char *recordID, char *patientFirstName, char *patientLa
         strcpy(rec->exitDate, exitDate);
     }
 
-    insertRecord(rec);
+    insertRecord(rec);      // same as RecordsParsing
 }
 
-
+// For every tree in every bucket count the patients whose exitDate is '-'.
+// Count only the records from one hash table as they both point to same data.
 void numCurrentPatients(char *disease) {
 
     for (int i = 0; i < diseaseHashTableNumOfEntries; i++) {
@@ -490,7 +510,7 @@ void numCurrentPatients(char *disease) {
     }
 }
 
-
+// Free all structs
 void exitInstruction() {
 
     for (int i = 0; i < diseaseHashTableNumOfEntries; i++) {

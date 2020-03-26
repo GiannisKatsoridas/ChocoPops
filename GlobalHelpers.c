@@ -3,7 +3,9 @@
 #include <string.h>
 #include "GlobalHelpers.h"
 
-
+// Parse the arguments depending on the flag given. The arguments can be given in any order
+// as long as they have the correct flag (eg -p). If any argument was not given, simply exit the program
+// and state what the error was.
 void parseArguments(char** argv, char** patientRecordsFile){
 
     int argumentPos;
@@ -78,9 +80,9 @@ void parseArguments(char** argv, char** patientRecordsFile){
 
 }
 
-// abcd, max 5
-// 67+68+69+70 = 274 % 5 = 4
-
+// The hash function is the mod of the ascii sum of the word.
+// eg "Name" in ascii is: 78 + 97 + 109 + 101 = 385
+// and if numOfEntries == 4 then 385 % 4 = 1.
 int hashFunction(char *string, int max) {
 
     int sum = 0;
@@ -92,6 +94,9 @@ int hashFunction(char *string, int max) {
     return sum % max;
 }
 
+// Initialize the hash tables with the size of the given arguments.
+// Available items contains how many items can a bucket hold. The number is
+// static and depends on the size given.
 void globalStructsInitialization() {
 
     diseaseHashTable = malloc(diseaseHashTableNumOfEntries * sizeof(bucket*));
@@ -109,6 +114,7 @@ void globalStructsInitialization() {
     available_items = available_space / sizeof(bucket_item *);
 }
 
+// Initialize a bucket with the necessary structs.
 bucket* initializeBucket() {
 
     bucket* b = malloc(bucketSize);
@@ -123,6 +129,7 @@ bucket* initializeBucket() {
     return b;
 }
 
+// Get the count of the total diseases from the hash table
 int getTotalDiseases() {
 
     int sum = 0;
@@ -145,6 +152,7 @@ int getTotalDiseases() {
     return sum;
 }
 
+// Get the count of the total countries from the hash table
 int getTotalCountries() {
 
     int sum = 0;
