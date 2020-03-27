@@ -87,13 +87,15 @@ void parseLine(char *line, char *delimeters) {
     int result = compareDates(r->entryDate, r->exitDate);       // if the exit date is smaller than the entry date then 0 will be returned.
 
     if (result == 0) {
-        printf("ERROR on record: %s. Wrong dates. The record will not be saved.\n", r->recordID);
+        printf("error\n");
+        //printf("ERROR on record: %s. Wrong dates. The record will not be saved.\n", r->recordID);
         return;
     }
 
 
     if (!checkRecordID(r->recordID)) {          // if a record id is duplicate then the program will exit.
-        printf("Record with ID: %s is duplicate. Program will now exit.\n", r->recordID);
+        printf("error\n");
+        //printf("Record with ID: %s is duplicate. Program will now exit.\n", r->recordID);
         errorCode = 1;
         return;
     }

@@ -20,14 +20,15 @@ int main(int argc, char** argv) {
     if(errorCode == 1)                              // If there has been an error (eg double record id) exit the program
         return 0;
 
-    printf("Records parsed. Please, give input:\n");
+    //printf("Records parsed. Please, give input:\n");
 
     char* line = NULL;
     size_t length;
     int size;
 
     size = getline(&line, &length, stdin);          // Read the first instruction from the user
-    line[strlen(line)-1] = '\0';                    // Remove the line break at the end
+    if(line[strlen(line)-1] == '\n')
+        line[strlen(line)-1] = '\0';                    // Remove the line break at the end
 
     while(strcmp(line, "/exit") != 0){              // While the user doesn't give "exit" run the instruction
 
@@ -38,7 +39,8 @@ int main(int argc, char** argv) {
         line = NULL;
 
         size = getline(&line, &length, stdin);
-        line[strlen(line)-1] = '\0';
+        if(line[strlen(line)-1] == '\n')
+            line[strlen(line)-1] = '\0';
     }
 
     free(line);

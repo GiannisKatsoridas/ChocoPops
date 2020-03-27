@@ -195,14 +195,16 @@ void executeInstruction(char *line) {
         record *rec = searchForRecord(recordID);
 
         if (rec == NULL) {
-            printf("No such record ID was found. Please try again with a valid recordID.\n");
+            printf("not found\n");
+            //printf("No such record ID was found. Please try again with a valid recordID.\n");
             free(recordID);
             free(exitDate);
             return;
         }
 
         if(compareDates(rec->entryDate, exitDate) == 0){
-            printf("Wrong date. Date of exit is previous to date of entry. Please provide correct dates:\n");
+            printf("error\n");
+            //printf("Wrong date. Date of exit is previous to date of entry. Please provide correct dates:\n");
             free(recordID);
             free(exitDate);
             return;
@@ -217,6 +219,8 @@ void executeInstruction(char *line) {
 
         free(recordID);
         free(exitDate);
+
+        printf("Record updated\n");
 
     } else if (strcmp(num, "/numCurrentPatients") == 0) {
 
@@ -234,7 +238,8 @@ void executeInstruction(char *line) {
             free(disease);
 
     } else
-        printf("ERROR. Not an acceptable instruction.\n");
+        printf("error\n");
+        //printf("ERROR. Not an acceptable instruction.\n");
 
 }
 
@@ -257,12 +262,20 @@ void globalDiseaseStats(char *date1, char *date2) {
                     break;
 
                 if (date1 == NULL)
-                    printf("Disease: %s\t\tNumber of Patients: %d\n", ptr->items[j]->key,
+                    printf("%s %d\n", ptr->items[j]->key,
                            getTreeSize(ptr->items[j]->value));  // count every node as a patient
                 else
-                    printf("Disease: %s\t\tNumber of Patients: %d\n", ptr->items[j]->key,
+                    printf("%s %d\n", ptr->items[j]->key,
                            getTreeSizeBetweenDates(ptr->items[j]->value, date1, date2));    // count only nodes inside the given dates
 
+//                if (date1 == NULL)
+//                    printf("Disease: %s\t\tNumber of Patients: %d\n", ptr->items[j]->key,
+//                           getTreeSize(ptr->items[j]->value));  // count every node as a patient
+//                else
+//                    printf("Disease: %s\t\tNumber of Patients: %d\n", ptr->items[j]->key,
+//                           getTreeSizeBetweenDates(ptr->items[j]->value, date1, date2));    // count only nodes inside the given dates
+//
+//
             }
 
             ptr = ptr->next;
@@ -296,16 +309,25 @@ void diseaseFrequency(char *virusName, char *date1, char *date2, char *country) 
     }
 
     if (pos < 0) {
-        printf("ERROR. No such disease in given records.\n");
+        printf("error\n");
+        //printf("ERROR. No such disease in given records.\n");
         return;
     }
 
     if (country == NULL)
-        printf("Disease frequency for: %s in all countries: %d.\n", virusName,
+        printf("%s %d\n", virusName,
                getTreeSizeBetweenDates(ptr->items[pos]->value, date1, date2));
     else
-        printf("Disease frequency for: %s in %s: %d.\n", virusName, country,
+        printf("%s %d\n", virusName,
                getTreeSizeBetweenDatesForCountry(ptr->items[pos]->value, date1, date2, country));
+
+
+//    if (country == NULL)
+//        printf("Disease frequency for: %s in all countries: %d.\n", virusName,
+//               getTreeSizeBetweenDates(ptr->items[pos]->value, date1, date2));
+//    else
+//        printf("Disease frequency for: %s in %s: %d.\n", virusName, country,
+//               getTreeSizeBetweenDatesForCountry(ptr->items[pos]->value, date1, date2, country));
 
 }
 
@@ -341,7 +363,8 @@ void topk_Diseases(int k, char *country, char *date1, char *date2) {
     }
 
     if (pos == -1) {
-        printf("ERROR. Country given was not found.\n");
+        printf("error\n");
+        //printf("ERROR. Country given was not found.\n");
         return;
     }
 
@@ -350,7 +373,7 @@ void topk_Diseases(int k, char *country, char *date1, char *date2) {
     heap = getTotalInfectedByCountry(ptr->items[pos]->value, date1, date2);
 
     if(heap == NULL){
-        printf("No diseases found in given country.\n");
+        //printf("No diseases found in given country.\n");
         return;
     }
 
@@ -358,7 +381,7 @@ void topk_Diseases(int k, char *country, char *date1, char *date2) {
 
     if (heap_size < k) {
 
-        printf("K given is bigger than total diseases of given country. K will change to total diseases.\n");
+        //printf("K given is bigger than total diseases of given country. K will change to total diseases.\n");
         k = heap_size;
 
     }
@@ -370,7 +393,8 @@ void topk_Diseases(int k, char *country, char *date1, char *date2) {
 
         heap = popFromHeap(heap, heap_size - i);
 
-        printf("Disease: %s\tNumber: %d\n", n->name, n->number);
+        printf("%s %d\n", n->name, n->number);
+        //printf("Disease: %s\tNumber: %d\n", n->name, n->number);
         free(n->name);
         free(n);
     }
@@ -410,14 +434,15 @@ void topk_Countries(int k, char *disease, char *date1, char *date2) {
     }
 
     if (pos == -1) {
-        printf("ERROR. Country given was not found.\n");
+        printf("error\n");
+        //printf("ERROR. Country given was not found.\n");
         return;
     }
 
     heap = getTotalInfectedByDisease(ptr->items[pos]->value, date1, date2);
 
     if (heap == NULL) {
-        printf("No countries found with given disease.\n");
+        //printf("No countries found with given disease.\n");
         return;
     }
 
@@ -425,7 +450,7 @@ void topk_Countries(int k, char *disease, char *date1, char *date2) {
 
     if (heap_size < k) {
 
-        printf("K given is bigger than total countries of given disease. K will change to total diseases.\n");
+        //printf("K given is bigger than total countries of given disease. K will change to total diseases.\n");
         k = heap_size;
 
     }
@@ -436,7 +461,8 @@ void topk_Countries(int k, char *disease, char *date1, char *date2) {
 
         heap = popFromHeap(heap, heap_size - i);
 
-        printf("Disease: %s\tNumber: %d\n", n->name, n->number);
+        //printf("Disease: %s\tNumber: %d\n", n->name, n->number);
+        printf("%s %d\n", n->name, n->number);
         free(n->name);
         free(n);
 
@@ -479,6 +505,8 @@ void insertPatientRecord(char *recordID, char *patientFirstName, char *patientLa
     }
 
     insertRecord(rec);      // same as RecordsParsing
+
+    printf("Record added\n");
 }
 
 // For every tree in every bucket count the patients whose exitDate is '-'.
@@ -501,7 +529,8 @@ void numCurrentPatients(char *disease) {
 
                 int sum = countCurrentPatientsInTree(ptr->items[j]->value);
 
-                printf("Number of current patients for disease: %s, is: %d\n", ptr->items[j]->key, sum);
+                printf("%s %d\n", ptr->items[j]->key, sum);
+                //printf("Number of current patients for disease: %s, is: %d\n", ptr->items[j]->key, sum);
             }
 
             ptr = ptr->next;
@@ -512,6 +541,8 @@ void numCurrentPatients(char *disease) {
 
 // Free all structs
 void exitInstruction() {
+
+    printf("exiting\n");
 
     for (int i = 0; i < diseaseHashTableNumOfEntries; i++) {
 
