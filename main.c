@@ -39,6 +39,8 @@ int main(int argc, char** argv) {
         line = NULL;
 
         size = getline(&line, &length, stdin);
+        if(size <= 0)
+            break;
         if(line[strlen(line)-1] == '\n')
             line[strlen(line)-1] = '\0';
     }
