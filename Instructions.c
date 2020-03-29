@@ -513,6 +513,8 @@ void insertPatientRecord(char *recordID, char *patientFirstName, char *patientLa
 // Count only the records from one hash table as they both point to same data.
 void numCurrentPatients(char *disease) {
 
+    int flag = 0;
+
     for (int i = 0; i < diseaseHashTableNumOfEntries; i++) {
 
         bucket *ptr = diseaseHashTable[i];
@@ -531,12 +533,15 @@ void numCurrentPatients(char *disease) {
 
                 printf("%s %d\n", ptr->items[j]->key, sum);
                 //printf("Number of current patients for disease: %s, is: %d\n", ptr->items[j]->key, sum);
+                flag = 1;
             }
 
             ptr = ptr->next;
         }
-
     }
+
+    if(flag == 0 && disease != NULL)        // Disease given was not found so print 0
+        printf("%s 0\n", disease);
 }
 
 // Free all structs
