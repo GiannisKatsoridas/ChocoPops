@@ -16,6 +16,7 @@ int main(int argc, char** argv) {
 
     globalStructsInitialization();                  // Initialize global variables and structs (eg HashTables)
 
+
     parseRecords(patientRecordsFile);               // Parse the records given in the file and put them in the hash tables
     if(errorCode == 1)                              // If there has been an error (eg double record id) exit the program
         return 0;
@@ -30,7 +31,7 @@ int main(int argc, char** argv) {
     if(line[strlen(line)-1] == '\n')
         line[strlen(line)-1] = '\0';                    // Remove the line break at the end
 
-    while(strcmp(line, "/exit") != 0){              // While the user doesn't give "exit" run the instruction
+    while(size > 0 && strcmp(line, "/exit") != 0){              // While the user doesn't give "exit" run the instruction
 
         executeInstruction(line);                   // Execute the instruction given
 

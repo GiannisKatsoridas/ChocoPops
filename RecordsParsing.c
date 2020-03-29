@@ -8,16 +8,14 @@ void parseRecords(char *patientRecordsFile) {
 
     FILE *f = fopen(patientRecordsFile, "r");
 
-    int size, pointer = 0;
+    int size;
     size_t length;
     char *line = NULL;
-    char *line_copy;
-    char *num;
     char *delimeters = " \t\n\0";
 
     size = getline(&line, &length, f);
 
-    while (size >= 0 && !feof(f)) {
+    while (size > 2 && !feof(f)) {
 
         parseLine(line, delimeters);        // Parse each line exclusively to get the record details
 
@@ -30,8 +28,9 @@ void parseRecords(char *patientRecordsFile) {
         size = getline(&line, &length, f);
 
     }
-    parseLine(line, delimeters);            // Parse the final line
 
+    if(size > 2)
+        parseLine(line, delimeters);
 
     free(line);
     line = NULL;
